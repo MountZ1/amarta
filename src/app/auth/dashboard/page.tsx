@@ -15,6 +15,7 @@ import {
   Radio,
   ArrowRight,
 } from "lucide-react";
+import todayLocal from "@/lib/todayLocal";
 
 interface TopProduct {
   productId: number;
@@ -52,6 +53,7 @@ interface DashboardMetrics {
 export default function AdminDashboardPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [dateReady, setDateReady] = useState(false);
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalSales: 0,
     totalRevenue: 0,
@@ -62,6 +64,14 @@ export default function AdminDashboardPage() {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
+    const today = todayLocal();
+    setStartDate(today);
+    setEndDate(today);
+    setDateReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!dateReady) return;
     let eventSource: EventSource | null = null;
 
     const connectSSE = () => {
@@ -114,17 +124,12 @@ export default function AdminDashboardPage() {
 
         <div className="flex items-center gap-2">
           <div
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-              connected
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${connected
                 ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
                 : "bg-amber-100 text-amber-800"
-            }`}
-          >
-            <Radio
-              className={`h-3 w-3 ${
-                connected ? "animate-pulse text-emerald-600" : ""
               }`}
-            />
+          >
+            <Radio className={`h-3 w-3 ${connected ? "animate-pulse text-emerald-600" : ""}`} />
             <span>{connected ? "Realtime SSE Aktif" : "Menghubungkan..."}</span>
           </div>
         </div>
@@ -161,8 +166,9 @@ export default function AdminDashboardPage() {
           {(startDate || endDate) && (
             <button
               onClick={() => {
-                setStartDate("");
-                setEndDate("");
+                const t = todayLocal();
+                setStartDate(t);
+                setEndDate(t);
               }}
               className="rounded-lg bg-muted px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
             >
@@ -184,9 +190,7 @@ export default function AdminDashboardPage() {
               <ShoppingBag className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-3xl font-extrabold text-foreground">
-            {metrics.totalSales}
-          </div>
+          <div className="mt-3 text-3xl font-extrabold text-foreground">{metrics.totalSales}</div>
           <p className="text-xs text-muted-foreground mt-1">Transaksi pesanan</p>
         </div>
 
@@ -222,8 +226,8 @@ export default function AdminDashboardPage() {
           <p className="text-xs text-muted-foreground mt-1">
             {metrics.topProduct
               ? `Terjual ${metrics.topProduct.totalQuantity} unit (${formatRupiah(
-                  metrics.topProduct.totalSalesAmount
-                )})`
+                metrics.topProduct.totalSalesAmount,
+              )})`
               : "Menunggu transaksi"}
           </p>
         </div>
@@ -254,27 +258,19 @@ export default function AdminDashboardPage() {
           ) : (
             <div className="divide-y">
               {metrics.latestOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between py-3 text-xs"
-                >
+                <div key={order.id} className="flex items-center justify-between py-3 text-xs">
                   <div>
-                    <div className="font-mono font-bold text-foreground">
-                      {order.invoice}
-                    </div>
+                    <div className="font-mono font-bold text-foreground">{order.invoice}</div>
                     <div className="text-muted-foreground mt-0.5">
                       {order.customerName} • {formatDateTime(order.createdAt)}
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div className="font-bold text-foreground">
-                      {formatRupiah(order.total)}
-                    </div>
+                    <div className="font-bold text-foreground">{formatRupiah(order.total)}</div>
                     <span
-                      className={`inline-block mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                        STATUS_META[order.status]?.bg || ""
-                      } ${STATUS_META[order.status]?.color || ""}`}
+                      className={`inline-block mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_META[order.status]?.bg || ""
+                        } ${STATUS_META[order.status]?.color || ""}`}
                     >
                       {STATUS_META[order.status]?.label || order.status}
                     </span>
@@ -302,16 +298,11 @@ export default function AdminDashboardPage() {
           </div>
 
           {metrics.lowestStockProducts.length === 0 ? (
-            <p className="py-8 text-center text-xs text-muted-foreground">
-              Belum ada data produk.
-            </p>
+            <p className="py-8 text-center text-xs text-muted-foreground">Belum ada data produk.</p>
           ) : (
             <div className="divide-y">
               {metrics.lowestStockProducts.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center justify-between py-3 text-xs"
-                >
+                <div key={p.id} className="flex items-center justify-between py-3 text-xs">
                   <div>
                     <div className="font-bold text-foreground">{p.name}</div>
                     <div className="text-muted-foreground mt-0.5">
@@ -321,13 +312,12 @@ export default function AdminDashboardPage() {
 
                   <div className="text-right">
                     <span
-                      className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-extrabold ${
-                        p.stock === 0
+                      className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-extrabold ${p.stock === 0
                           ? "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
                           : p.stock <= 5
-                          ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-                          : "bg-muted text-foreground"
-                      }`}
+                            ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                            : "bg-muted text-foreground"
+                        }`}
                     >
                       Stok: {p.stock}
                     </span>

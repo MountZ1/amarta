@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/database";
 import { orders, orderItems, products } from "@/database/schema/schema";
-import { and, gte, lte, desc, asc, sql, eq, ne } from "drizzle-orm";
+import { and, gte, lte, desc, asc, sql, eq, ne, between } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
@@ -14,8 +14,15 @@ export async function GET(req: NextRequest) {
   const startStr = searchParams.get("start");
   const endStr = searchParams.get("end");
 
-  const startDate = startStr ? new Date(startStr) : null;
-  const endDate = endStr ? new Date(`${endStr}T23:59:59.999Z`) : null;
+  const startDate = startStr ? new Date(`${startStr}T00:00:00+07:00`) : null;
+  const endDate = endStr ? new Date(`${endStr}T23:59:59.999+07:00`) : null;
+
+  if (
+    (startDate && Number.isNaN(startDate.getTime())) ||
+    (endDate && Number.isNaN(endDate.getTime()))
+  ) {
+    return new Response("Format tanggal tidak valid", { status: 400 });
+  }
 
   const responseStream = new TransformStream();
   const writer = responseStream.writable.getWriter();
@@ -65,14 +72,15 @@ export async function GET(req: NextRequest) {
 
     const topProduct = topProducts[0] || null;
 
-    // 3. 5 latest orders
+    //5 latest orders
     const latestOrders = await db
       .select()
       .from(orders)
+      .where(whereClause)
       .orderBy(desc(orders.createdAt))
       .limit(5);
 
-    // 4. 5 products with lowest stock
+    // 5 products with lowest stock
     const lowestStockProducts = await db
       .select({
         id: products.id,
@@ -108,7 +116,7 @@ export async function GET(req: NextRequest) {
     } finally {
       try {
         await writer.close();
-      } catch {}
+      } catch { }
     }
   })();
 
@@ -116,7 +124,7 @@ export async function GET(req: NextRequest) {
     isActive = false;
     try {
       writer.close();
-    } catch {}
+    } catch { }
   });
 
   return new Response(responseStream.readable, {
