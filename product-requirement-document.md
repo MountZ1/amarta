@@ -45,10 +45,10 @@ Amarta Kopi adalah toko kopi online sederhana. Pembeli dapat melihat kopi, memil
 - Pembeli dapat mengubah berat (250, 500, 750, atau 1000 gram) dan grind size (fine, medium, coarse, atau biji) di keranjang.
 - Pembeli dapat memilih sebagian atau seluruh item untuk checkout.
 - Data nama, nomor telepon, dan alamat disimpan di browser untuk pemesanan berikutnya.
-- Pembeli memilih provinsi, kota/kabupaten, kecamatan, kode pos, dan kurir.
+- Pembeli memilih provinsi, kota/kabupaten, kecamatan, dan kode pos; kurir tidak harus dipilih sebelum cek ongkir.
 - Data lokasi dibaca dari database terlebih dahulu. Jika belum tersedia, backend mengambilnya dari RajaOngkir lalu menyimpannya untuk permintaan berikutnya.
-- Backend meminta tarif ke RajaOngkir berdasarkan kecamatan tujuan, kurir, dan berat total item yang dipilih. Pembeli memilih layanan yang tersedia sebelum membuat pesanan.
-- Tarif disimpan sementara sebagai quote bertanda tangan yang kedaluwarsa setelah 15 menit. Checkout memvalidasi quote tersebut tanpa meminta tarif RajaOngkir untuk kedua kalinya.
+- Backend meminta tarif untuk semua kurir aktif sekaligus berdasarkan kecamatan tujuan dan berat total item terpilih. Pembeli lalu memilih layanan dari hasil berbagai kurir yang tersedia.
+- Setiap pilihan layanan disimpan sementara sebagai quote bertanda tangan yang memuat ekspedisi dan kedaluwarsa setelah 15 menit. Checkout memvalidasi quote terpilih tanpa meminta tarif RajaOngkir untuk kedua kalinya.
 - Server memvalidasi data, harga, dan stok sebelum membuat pesanan.
 - Harga per kemasan dihitung dari harga per kilogram: `harga per kg × berat gram / 1000`.
 - Setelah pesanan dibuat, stok produk dikurangi dan pembeli diarahkan ke halaman sukses.

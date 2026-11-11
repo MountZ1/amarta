@@ -113,6 +113,7 @@ erDiagram
 - Status pesanan berasal dari enum `order_status`: `pending`, `processing`, `shipped`, `completed`, dan `cancelled`.
 - `orders.subtotal` adalah jumlah harga barang; `shipping_cost` adalah ongkos kirim; `total` adalah subtotal ditambah ongkos kirim.
 - `orders.district_id` mengacu pada kecamatan di cache lokasi; nama provinsi/kota/kecamatan pada pesanan disimpan sebagai snapshot agar alamat transaksi tetap terbaca.
-- `orders.courier` dan `courier_service` menyimpan pilihan layanan; `tracking_number` dapat diisi setelah pesanan dikirim. Daftar kurir aktif berasal dari `expeditions`.
+- `orders.courier` dan `courier_service` menyimpan pilihan layanan; `tracking_number` dapat diisi setelah pesanan dikirim. `orders.courier` adalah kode teks, bukan foreign key ke `expeditions`.
+- `expeditions` menyediakan daftar kurir aktif untuk permintaan tarif multi-kurir. `expeditionId` dipakai dan divalidasi di quote sementara, tetapi tidak disimpan sebagai kolom order.
 - `invoice` wajib diisi dan memiliki constraint unique.
 - Cache penawaran ongkir bertanda tangan dan kedaluwarsa disimpan di token checkout, bukan di tabel database.

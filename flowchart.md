@@ -16,25 +16,26 @@ flowchart TD
     I -- Ya --> J[Server validasi harga dan stok terbaru]
     J --> K{Item tersedia?}
     K -- Tidak --> G
-    K -- Ya --> L[Pilih provinsi, kota, kecamatan, kode pos, dan kurir]
+    K -- Ya --> L[Pilih provinsi, kota, kecamatan, dan kode pos]
     L --> M{Lokasi ada di database?}
     M -- Tidak --> N[Ambil lokasi dari RajaOngkir dan simpan ke database]
-    M -- Ya --> O[Pilih layanan pengiriman]
+    M -- Ya --> O[Ambil semua kurir aktif dari expeditions]
     N --> O
-    O --> P[Hitung ongkir melalui RajaOngkir]
-    P --> Q[Buat token quote bertanda tangan dengan TTL]
-    Q --> R[Pilih layanan dan isi kontak serta alamat jalan]
-    R --> S[Checkout mengirim quote token dan item terpilih]
-    S --> T[Server validasi token, berat, harga, stok, dan data pesanan]
-    T --> U{Data valid dan token masih berlaku?}
-    U -- Tidak --> V[Tampilkan kesalahan; hitung ulang ongkir jika perlu]
-    V --> L
-    U -- Ya --> W[Hitung subtotal barang dan total termasuk ongkir]
-    W --> X[Buat invoice dan pesanan]
-    X --> Y[Simpan rincian lokasi/kurir, order_items, dan kurangi stok]
-    Y --> Z[Alihkan ke halaman sukses dengan invoice]
-    Z --> AA[Tampilkan invoice, item, berat, grind size, ongkir, dan total]
-    AA --> AB[Pembeli dapat melacak pesanan dengan invoice]
+    O --> P[Kirim satu permintaan tarif untuk semua kurir]
+    P --> Q[Buat quote bertanda tangan untuk setiap layanan]
+    Q --> R[Tampilkan layanan berbagai kurir; pembeli pilih satu]
+    R --> S[Isi kontak dan alamat jalan]
+    S --> T[Checkout mengirim quote terpilih dan item terpilih]
+    T --> U[Server validasi token, ekspedisi, tujuan, berat, harga, dan stok]
+    U --> V{Quote valid dan belum kedaluwarsa?}
+    V -- Tidak --> W[Tampilkan kesalahan; minta cek ongkir kembali]
+    W --> O
+    V -- Ya --> X[Hitung subtotal barang dan total termasuk ongkir]
+    X --> Y[Buat invoice dan pesanan]
+    Y --> Z[Simpan snapshot lokasi/kurir, order_items, dan kurangi stok]
+    Z --> AA[Alihkan ke halaman sukses dengan invoice]
+    AA --> AB[Tampilkan invoice, item, berat, grind size, ongkir, dan total]
+    AB --> AC[Pembeli dapat melacak pesanan dengan invoice]
 ```
 
 ## Alur admin dan pemrosesan pesanan
