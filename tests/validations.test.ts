@@ -76,6 +76,8 @@ describe("POST Validation Schemas", () => {
         customerName: "Budi Santoso",
         phoneNumber: "081234567890",
         address: "Jl. Sudirman No 10, Jakarta",
+        postalCode: "55111",
+        quoteToken: "signed-quote",
         items: [{ productId: 1, quantity: 2 }],
       });
       expect(result.success).toBe(true);
@@ -86,6 +88,8 @@ describe("POST Validation Schemas", () => {
         customerName: "Budi Santoso",
         phoneNumber: "081234567890",
         address: "Jl. Sudirman No 10, Jakarta",
+        postalCode: "55111",
+        quoteToken: "signed-quote",
         items: [],
       });
       expect(result.success).toBe(false);
@@ -96,6 +100,18 @@ describe("POST Validation Schemas", () => {
         customerName: "A",
         phoneNumber: "123",
         address: "Jl",
+        postalCode: "1",
+        quoteToken: "signed-quote",
+        items: [{ productId: 1, quantity: 1 }],
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it("should require shipping quote and postal code", () => {
+      const result = orderCreateSchema.safeParse({
+        customerName: "Budi Santoso",
+        phoneNumber: "081234567890",
+        address: "Jl. Sudirman No 10, Jakarta",
         items: [{ productId: 1, quantity: 1 }],
       });
       expect(result.success).toBe(false);

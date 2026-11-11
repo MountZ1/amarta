@@ -24,6 +24,16 @@ interface OrderDetail {
   customerName: string;
   phoneNumber: string;
   address: string;
+  provinceName: string | null;
+  cityName: string | null;
+  districtName: string | null;
+  postalCode: string | null;
+  courier: string | null;
+  courierService: string | null;
+  etd: string | null;
+  shippingCost: number;
+  subtotal: number;
+  trackingNumber: string | null;
   status: OrderStatus;
   total: number;
   createdAt: string;
@@ -290,6 +300,24 @@ function CheckOrderContent() {
                   <p className="font-semibold text-sm text-foreground mt-0.5">
                     {order.address}
                   </p>
+                  <p className="font-semibold text-sm text-foreground mt-0.5">
+                    {[order.districtName, order.cityName, order.provinceName]
+                      .filter(Boolean)
+                      .join(", ")}
+                    {order.postalCode && ` ${order.postalCode}`}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Kurir:</span>
+                  <p className="font-semibold text-sm text-foreground mt-0.5">
+                    {order.courier || "-"} {order.courierService || ""}
+                    {order.etd && ` (estimasi ${order.etd})`}
+                  </p>
+                  {order.trackingNumber && (
+                    <p className="mt-0.5 text-xs">
+                      Resi: <span className="font-mono">{order.trackingNumber}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -338,10 +366,22 @@ function CheckOrderContent() {
               </div>
 
               <div className="flex justify-between items-center border-t pt-4 mt-2">
-                <span className="font-bold text-base">Total Tagihan</span>
-                <span className="font-extrabold text-xl text-amber-900 dark:text-amber-400">
-                  {formatRupiah(order.total)}
-                </span>
+                <div className="w-full space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal produk</span>
+                    <span>{formatRupiah(order.subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Ongkos kirim</span>
+                    <span>{formatRupiah(order.shippingCost)}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-3">
+                    <span className="font-bold text-base">Total Tagihan</span>
+                    <span className="font-extrabold text-xl text-amber-900 dark:text-amber-400">
+                      {formatRupiah(order.total)}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

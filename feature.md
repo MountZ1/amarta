@@ -53,3 +53,12 @@
 - setelah create order buat halaman sukses create order dengan no invoice, list item yang dibeli (termasuk weight dan grind level) dan total
 - di show order milik tambahkan weight tiap produk, hapus id di list,masukkan grind size dan hapus typografi order_items
 - list pesanan admin tambah search by invoice dan nama customer juga phone number
+
+# Integrasi ongkir raja ongkir
+
+- cek schema untuk perubahan database ini sudah di implement jadi tidak perlu run migration lagi
+- bagian checkout tambahkan select provinces, city dan district ke api backend dengan logic check ke database kalau tidak ada hit ke rajaongkir (check lib rajaongkir) kemudian simpan data ke databse dan return
+- hit ke rajaongkir untuk menghitung nilai ongkir kemudian buat cache (cek lib quote.ts). cache digunakan agar tidak perlu hit 2x ke rajaongkir saat checkout dan buat order
+- validasi nilai order temasuk nilai ongkir berdasarkan cache yang dibuat sebelumya
+- tambahkan data ke pesanan detail di sisi admin
+- berdasarkan perubahan ini update juga erd dan flowchart

@@ -16,17 +16,25 @@ flowchart TD
     I -- Ya --> J[Server validasi harga dan stok terbaru]
     J --> K{Item tersedia?}
     K -- Tidak --> G
-    K -- Ya --> L[Isi nama, nomor telepon, dan alamat]
-    L --> M[Server validasi data pesanan]
-    M --> N{Data valid dan stok cukup?}
-    N -- Tidak --> O[Tampilkan pesan kesalahan]
-    O --> G
-    N -- Ya --> P[Hitung harga sesuai berat]
-    P --> Q[Buat invoice dan pesanan]
-    Q --> R[Simpan order_items dan kurangi stok]
-    R --> S[Alihkan ke halaman sukses dengan invoice]
-    S --> T[Tampilkan invoice, item, berat, grind size, dan total]
-    T --> U[Pembeli dapat melacak pesanan dengan invoice]
+    K -- Ya --> L[Pilih provinsi, kota, kecamatan, kode pos, dan kurir]
+    L --> M{Lokasi ada di database?}
+    M -- Tidak --> N[Ambil lokasi dari RajaOngkir dan simpan ke database]
+    M -- Ya --> O[Pilih layanan pengiriman]
+    N --> O
+    O --> P[Hitung ongkir melalui RajaOngkir]
+    P --> Q[Buat token quote bertanda tangan dengan TTL]
+    Q --> R[Pilih layanan dan isi kontak serta alamat jalan]
+    R --> S[Checkout mengirim quote token dan item terpilih]
+    S --> T[Server validasi token, berat, harga, stok, dan data pesanan]
+    T --> U{Data valid dan token masih berlaku?}
+    U -- Tidak --> V[Tampilkan kesalahan; hitung ulang ongkir jika perlu]
+    V --> L
+    U -- Ya --> W[Hitung subtotal barang dan total termasuk ongkir]
+    W --> X[Buat invoice dan pesanan]
+    X --> Y[Simpan rincian lokasi/kurir, order_items, dan kurangi stok]
+    Y --> Z[Alihkan ke halaman sukses dengan invoice]
+    Z --> AA[Tampilkan invoice, item, berat, grind size, ongkir, dan total]
+    AA --> AB[Pembeli dapat melacak pesanan dengan invoice]
 ```
 
 ## Alur admin dan pemrosesan pesanan

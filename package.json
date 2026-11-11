@@ -9,7 +9,9 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "bun run src/database/seed/seed.ts"
+    "db:seed": "bun run src/database/seed/seed.ts",
+    "db:seed:provinces": "bun run src/database/seed/provinces.ts",
+    "db:seed:expeditions": "bun run src/database/seed/expeditions.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -22,6 +22,20 @@
       "when": 1794307372137,
       "tag": "0002_add-weight-and-grind-size",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794355366478,
+      "tag": "0003_add-location-tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794356017093,
+      "tag": "0004_add-expeditions-table",
+      "breakpoints": true
     }
   ]
 }

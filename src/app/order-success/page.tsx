@@ -11,6 +11,15 @@ import { AlertCircle, CheckCircle2, Coffee, PackageCheck } from "lucide-react";
 interface CreatedOrder {
   invoice: string;
   total: number;
+  subtotal: number;
+  shippingCost: number;
+  courier: string | null;
+  courierService: string | null;
+  etd: string | null;
+  provinceName: string | null;
+  cityName: string | null;
+  districtName: string | null;
+  postalCode: string | null;
   createdAt: string;
 }
 
@@ -129,6 +138,20 @@ function OrderSuccessContent() {
                 <PackageCheck className="h-8 w-8 shrink-0 text-amber-800" />
               </div>
 
+              <div className="rounded-lg bg-muted/40 p-3 text-sm">
+                <div className="font-semibold">Informasi pengiriman</div>
+                <div className="mt-1 text-muted-foreground">
+                  {order.courier} {order.courierService}
+                  {order.etd && ` • Estimasi ${order.etd}`}
+                </div>
+                <div className="text-muted-foreground">
+                  {[order.districtName, order.cityName, order.provinceName]
+                    .filter(Boolean)
+                    .join(", ")}
+                  {order.postalCode && ` ${order.postalCode}`}
+                </div>
+              </div>
+
               <div>
                 <h2 className="mb-3 font-bold">Item yang Dibeli</h2>
                 <div className="divide-y">
@@ -166,11 +189,21 @@ function OrderSuccessContent() {
                 </div>
               </div>
 
-              <div className="flex justify-between border-t pt-4 text-base font-extrabold">
-                <span>Total Pembayaran</span>
-                <span className="text-amber-900 dark:text-amber-400">
-                  {formatRupiah(order.total)}
-                </span>
+              <div className="space-y-2 border-t pt-4 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subtotal produk</span>
+                  <span>{formatRupiah(order.subtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Ongkos kirim</span>
+                  <span>{formatRupiah(order.shippingCost)}</span>
+                </div>
+                <div className="flex justify-between border-t pt-3 text-base font-extrabold">
+                  <span>Total Pembayaran</span>
+                  <span className="text-amber-900 dark:text-amber-400">
+                    {formatRupiah(order.total)}
+                  </span>
+                </div>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">

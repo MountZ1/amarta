@@ -45,16 +45,20 @@ Amarta Kopi adalah toko kopi online sederhana. Pembeli dapat melihat kopi, memil
 - Pembeli dapat mengubah berat (250, 500, 750, atau 1000 gram) dan grind size (fine, medium, coarse, atau biji) di keranjang.
 - Pembeli dapat memilih sebagian atau seluruh item untuk checkout.
 - Data nama, nomor telepon, dan alamat disimpan di browser untuk pemesanan berikutnya.
+- Pembeli memilih provinsi, kota/kabupaten, kecamatan, kode pos, dan kurir.
+- Data lokasi dibaca dari database terlebih dahulu. Jika belum tersedia, backend mengambilnya dari RajaOngkir lalu menyimpannya untuk permintaan berikutnya.
+- Backend meminta tarif ke RajaOngkir berdasarkan kecamatan tujuan, kurir, dan berat total item yang dipilih. Pembeli memilih layanan yang tersedia sebelum membuat pesanan.
+- Tarif disimpan sementara sebagai quote bertanda tangan yang kedaluwarsa setelah 15 menit. Checkout memvalidasi quote tersebut tanpa meminta tarif RajaOngkir untuk kedua kalinya.
 - Server memvalidasi data, harga, dan stok sebelum membuat pesanan.
 - Harga per kemasan dihitung dari harga per kilogram: `harga per kg × berat gram / 1000`.
 - Setelah pesanan dibuat, stok produk dikurangi dan pembeli diarahkan ke halaman sukses.
-- Halaman sukses menampilkan nomor invoice, item yang dibeli, berat, grind size, harga item, dan total.
+- Halaman sukses menampilkan nomor invoice, item yang dibeli, berat, grind size, pilihan kurir/layanan, ongkir, dan total.
 - Invoice dibuat oleh backend dengan format `INV-DDMMYYHHSSMS`.
 
 ### Pelacakan pesanan
 
 - Pembeli dapat mencari pesanan menggunakan invoice.
-- Halaman detail menampilkan status, data pengiriman, daftar item, berat, grind size, dan total.
+- Halaman detail menampilkan status, alamat dan wilayah tujuan, kurir/layanan, estimasi, nomor resi bila tersedia, daftar item, berat, grind size, ongkir, dan total.
 
 ### Area admin
 
@@ -71,6 +75,17 @@ Amarta Kopi adalah toko kopi online sederhana. Pembeli dapat melihat kopi, memil
 | `shipped` | `completed` |
 | `completed` atau `cancelled` | Tidak ada |
 
+## Konfigurasi Integrasi Pengiriman
+
+Integrasi membutuhkan environment variables server-side:
+
+- `RAJAONGKIR_API_KEY` — API key RajaOngkir.
+- `RAJAONGKIR_ORIGIN_DISTRICT_ID` — ID kecamatan asal dari provider.
+- `QUOTE_SECRET` — secret acak rahasia untuk menandatangani quote ongkir.
+- `RAJAONGKIR_BASE_URL` — opsional; default `https://rajaongkir.komerce.id/api/v1`.
+
+Seed daftar kurir yang didukung ke tabel `expeditions` dengan `bun run db:seed:expeditions`. Data provinsi dapat diisi terlebih dahulu dengan `bun run db:seed:provinces`; kota dan kecamatan diambil dan dicache ketika diminta. Skema tabel lokasi, ekspedisi, dan pesanan harus tersedia sebelum endpoint integrasi digunakan.
+
 ## Aturan dan Batasan
 
 - Buyer tidak memerlukan akun. Tabel `users` hanya untuk admin.
@@ -79,14 +94,14 @@ Amarta Kopi adalah toko kopi online sederhana. Pembeli dapat melihat kopi, memil
 - Endpoint POST harus memvalidasi input.
 - Perubahan struktur database atau tabel memerlukan persetujuan terlebih dahulu. Migrasi yang sudah dijalankan tidak diedit; perubahan skema menggunakan migrasi baru.
 - Proyek menggunakan Bun untuk instalasi, pengembangan, pengujian, dan perintah proyek.
-- Integrasi payment gateway dan ketentuan ongkos kirim eksternal belum ditentukan dalam spesifikasi ini.
+- Pembayaran berada di luar cakupan; RajaOngkir digunakan untuk daftar lokasi dan kalkulasi tarif saja.
 
 ## Kriteria Penerimaan Utama
 
 1. Pembeli dapat membuat pesanan tanpa login.
 2. Pembeli dapat memilih varian kopi dan hanya checkout item yang dipilih.
 3. Harga dan stok pesanan dihitung serta divalidasi di server.
-4. Halaman sukses menampilkan invoice, daftar item beserta berat dan grind size, serta total.
+4. Halaman sukses menampilkan invoice, daftar item beserta berat dan grind size, ongkir, serta total.
 5. Pembeli dapat melihat pesanan menggunakan invoice.
 6. Admin dapat mengelola katalog dan pesanan, termasuk pencarian dan transisi status yang valid.
 7. Input API POST divalidasi dan perubahan perilaku penting memiliki pengujian.

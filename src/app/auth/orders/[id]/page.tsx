@@ -30,6 +30,16 @@ interface OrderData {
   customerName: string;
   phoneNumber: string;
   address: string;
+  provinceName: string | null;
+  cityName: string | null;
+  districtName: string | null;
+  postalCode: string | null;
+  courier: string | null;
+  courierService: string | null;
+  etd: string | null;
+  shippingCost: number;
+  subtotal: number;
+  trackingNumber: string | null;
   status: OrderStatus;
   total: number;
   createdAt: string;
@@ -267,7 +277,44 @@ function AdminOrderDetailContent() {
               <p className="font-medium text-xs text-foreground mt-0.5">
                 {order.address}
               </p>
+              <p className="font-medium text-xs text-foreground mt-1">
+                {[order.districtName, order.cityName, order.provinceName]
+                  .filter(Boolean)
+                  .join(", ")}
+                {order.postalCode && ` ${order.postalCode}`}
+              </p>
             </div>
+          </div>
+        </div>
+
+        <div className="grid gap-4 border-t pt-4 text-xs sm:grid-cols-2">
+          <div>
+            <span className="font-semibold text-muted-foreground">
+              Pengiriman:
+            </span>
+            <p className="mt-1 font-bold text-sm">
+              {order.courier || "-"} {order.courierService || ""}
+              {order.etd && (
+                <span className="ml-1 font-normal text-muted-foreground">
+                  (estimasi {order.etd})
+                </span>
+              )}
+            </p>
+            {order.trackingNumber && (
+              <p className="mt-1">
+                Nomor resi: <span className="font-mono">{order.trackingNumber}</span>
+              </p>
+            )}
+          </div>
+          <div className="space-y-1 text-right">
+            <p className="flex justify-between">
+              <span className="text-muted-foreground">Subtotal produk</span>
+              <span>{formatRupiah(order.subtotal)}</span>
+            </p>
+            <p className="flex justify-between">
+              <span className="text-muted-foreground">Ongkos kirim</span>
+              <span>{formatRupiah(order.shippingCost)}</span>
+            </p>
           </div>
         </div>
       </div>

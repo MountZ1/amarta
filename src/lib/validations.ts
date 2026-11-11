@@ -44,6 +44,8 @@ export const orderCreateSchema = z.object({
   phoneNumber: z.string().min(8, "Nomor telepon minimal 8 digit"),
   address: z.string().min(5, "Alamat minimal 5 karakter"),
   items: z.array(orderItemSchema).min(1, "Keranjang belanja tidak boleh kosong"),
+  postalCode: z.string().trim().min(3, "Kode pos harus diisi").max(12),
+  quoteToken: z.string().min(1, "Tarif pengiriman harus dipilih"),
 });
 
 export const orderStatusSchema = z.object({
